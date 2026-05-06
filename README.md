@@ -1,40 +1,96 @@
 # Eureka Server
 
-Servidor de descoberta de serviços desenvolvido com Spring Boot e Spring Cloud Netflix Eureka para arquiteturas de microsserviços.
+Servidor de Service Discovery construído com Spring Boot + Spring Cloud Netflix Eureka, preparado para arquiteturas distribuídas com foco em:
 
-Este projeto é responsável por centralizar o registro e a descoberta dinâmica dos serviços da aplicação, permitindo comunicação desacoplada entre microsserviços, escalabilidade e integração com API Gateway.
+- Descoberta de serviços
+- Segurança
+- Observabilidade
+- Monitoramento em tempo real
 
-## Tecnologias utilizadas
+---
 
-- Java 17+
+# Tecnologias utilizadas
+
+- Java 17
 - Spring Boot
 - Spring Cloud Netflix Eureka
+- Spring Security
+- Spring Boot Actuator
+- Micrometer
+- Prometheus
+- Grafana
 - Maven
 
-## Funcionalidades
+---
 
-- Registro automático de microsserviços
-- Descoberta dinâmica de serviços
-- Centralização das instâncias da arquitetura
-- Suporte a escalabilidade horizontal
-- Integração com API Gateway e demais microsserviços
+# Funcionalidades
 
-## Estrutura do projeto
+✅ Service Discovery  
+✅ Dashboard Eureka protegido  
+✅ Basic Authentication  
+✅ Health Checks  
+✅ Métricas de aplicação  
+✅ Endpoint Prometheus  
+✅ Integração com Grafana  
+✅ Monitoramento em tempo real  
 
-```bash
-src
- └── main
-     ├── java
-     │    └── ...EurekaServerApplication.java
-     └── resources
-          └── application.yml
+---
+
+# Arquitetura
+
+```text
+                        +----------------------+
+                        |    Eureka Server     |
+                        |       :8761          |
+                        +----------------------+
+                                  |
+                                  |
+                     /actuator/prometheus
+                                  |
+                                  |
+                        +----------------------+
+                        |     Prometheus       |
+                        |       :9090          |
+                        +----------------------+
+                                  |
+                                  |
+                        +----------------------+
+                        |       Grafana        |
+                        |       :3000          |
+                        +----------------------+
 ```
 
-## Configuração
+---
 
-O servidor roda na porta `8761`.
+# Estrutura do projeto
 
-Exemplo de configuração:
+```bash
+eureka-server/
+│
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   ├── config/
+│   │   │   │   └── SecurityConfig.java
+│   │   │   │
+│   │   │   └── EurekaServerApplication.java
+│   │   │
+│   │   └── resources/
+|   |   ├── observability/
+│   |   |   └── prometheus.yml
+│   │   └── application.properties
+│   │   └── application.yml
+│   │
+│   └── test/
+
+│
+├── pom.xml
+└── README.md
+```
+
+---
+
+# Configuração principal
 
 ```yaml
 server:
@@ -50,80 +106,150 @@ eureka:
     fetch-registry: false
 ```
 
-## Como executar o projeto
+---
 
-### Clone o repositório
+# Segurança
+
+O dashboard do Eureka está protegido via Basic Authentication.
+
+## Acesso
+
+```txt
+http://localhost:8761
+```
+
+## Credenciais
+
+```txt
+username: admin
+password: 123456
+```
+
+---
+
+# Observabilidade
+
+Este projeto possui integração com:
+
+- Spring Boot Actuator
+- Micrometer
+- Prometheus
+- Grafana
+
+As métricas são expostas pelo endpoint:
+
+```bash
+GET /actuator/prometheus
+```
+
+E consumidas por Prometheus para visualização no Grafana.
+
+---
+
+# Endpoints disponíveis
+
+## Health Check
+
+```bash
+GET /actuator/health
+```
+
+## Métricas
+
+```bash
+GET /actuator/metrics
+```
+
+## Prometheus
+
+```bash
+GET /actuator/prometheus
+```
+
+---
+
+# Como executar
+
+## Clonar repositório
 
 ```bash
 git clone <url-do-repositorio>
 ```
 
-### Acesse a pasta do projeto
+---
+
+## Entrar na pasta
 
 ```bash
 cd eureka-server
 ```
 
-### Execute a aplicação
+---
+
+## Executar aplicação
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-Ou execute pela sua IDE.
-
-## Dashboard Eureka
-
-Após iniciar o projeto, acesse:
-
-http://localhost:8761
-
-No dashboard será possível visualizar todos os microsserviços registrados.
-
-## Integração com outros microsserviços
-
-Para registrar um serviço neste Eureka Server, configure o microsserviço cliente:
-
-```yaml
-spring:
-  application:
-    name: auth-service
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-```
-
-Após iniciar o serviço, ele aparecerá automaticamente no dashboard.
-
-## Arquitetura
-
-```text
-                    +----------------+
-                    |  Eureka Server |
-                    |      :8761     |
-                    +----------------+
-                             |
-        -----------------------------------------------
-        |                    |                         |
-        |                    |                         |
-+---------------+   +----------------+      +----------------+
-| Gateway       |   | Auth Service   |      | Product Service|
-+---------------+   +----------------+      +----------------+
-```
-
-## Objetivo do projeto
-
-Este projeto faz parte de uma arquitetura baseada em microsserviços, garantindo descoberta automática, desacoplamento entre serviços e facilidade de manutenção e escalabilidade do sistema.
+ou execute pela IDE.
 
 ---
 
-# 👩‍💻 Desenvolvedora
+# Executando Prometheus
+
+Utilizando a configuração do projeto:
+
+```bash
+prometheus.exe --config.file=observability/prometheus.yml
+```
+
+Acesso:
+
+```txt
+http://localhost:9090
+```
+
+---
+
+# Visualizando métricas no Grafana
+
+Após configurar o Prometheus como datasource no Grafana:
+
+```txt
+http://localhost:3000
+```
+
+As métricas do Eureka Server podem ser acompanhadas em tempo real através de dashboards.
+
+---
+
+# Melhorias futuras
+
+- Docker
+- Eureka Cluster
+- Profiles por ambiente
+- Logs distribuídos
+- CI/CD
+- Testes de integração
+
+---
+
+# Objetivo do projeto
+
+Demonstrar implementação prática de componentes essenciais em arquiteturas distribuídas:
+
+- Service Discovery
+- Segurança
+- Observabilidade
+- Monitoramento
+- Escalabilidade
+
+---
+
+# Desenvolvedora
 
 ## Helen Cristina Batista
 
-Back-End Developer • Java • Spring Boot • Microsservices • RabbitMQ
-
-<p align="left">
-  <a href="https://gith
+Back-End Developer  
+Java • Spring Boot • Microservices • RabbitMQ • Observability
